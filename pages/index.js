@@ -3,19 +3,11 @@
 import {
   Box,
   Button,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Radio,
   RadioGroup,
   Stack,
   Text,
   useColorModeValue,
-  useDisclosure,
   VStack,
 } from "@chakra-ui/react";
 import { GoogleGenerativeAI } from "@google/generative-ai";
@@ -222,9 +214,7 @@ const Home = () => {
   const [answers, setAnswers] = useState({});
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [score, setScore] = useState(0);
-  const [isKhushi, setIsKhushi] = useState(true);
   const [aiRemark, setAiRemark] = useState("");
-  const [loveRemark, setLoveRemark] = useState("");
 
   const handleNext = () => {
     const selectedAnswer = answers[currentQuestion];
@@ -240,33 +230,11 @@ const Home = () => {
     setAnswers({ ...answers, [currentQuestion]: value });
   };
 
-  const { isOpen, onOpen, onClose } = useDisclosure();
-
   const genAI = new GoogleGenerativeAI(
     "AIzaSyCV5D1rcZ3EN9sa0l7elScHMnawyAmEiUM"
   );
   const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-  const handleLoveRemarks = async () => {
-    const prompt = `my crush wants to get a personalised response give her a lovely quote that defines her inner beauty as 
-    well as outer beauty just keep it to point, i am showing it on my website, just give the direct love words, no formality`;
 
-    try {
-      const response = await model.generateContent(prompt);
-
-      setLoveRemark(response.response.text());
-      // if (response.ok) {
-      //   const data = await response.json();
-      // setAiRemark(data.remark);
-      // } else {
-      //   setAiRemark("Oops! Something went wrong while getting your remark.");
-      // }
-    } catch (error) {
-      console.error("Error fetching remark:", error);
-      setLoveRemark(
-        "Error connecting to AI. darling but i still can give you compliment if you call me"
-      );
-    }
-  };
   const handleGetAiRemark = async () => {
     const prompt = `User answered the following questions: \n${questions
       .map(
@@ -281,7 +249,9 @@ const Home = () => {
       setAiRemark(response.response.text());
     } catch (error) {
       console.error("Error fetching remark:", error);
-      setAiRemark("Error connecting to AI.");
+      setAiRemark(`Error connecting to AI, Man I probably have burnt my limit AI API uses, you can still go ahead and 
+        paste this given propmt to any AI chat bots of your choice "${prompt}"
+        `);
     }
   };
 
@@ -296,210 +266,101 @@ const Home = () => {
       alignItems="center"
       fontFamily="'Poppins', sans-serif"
     >
-      {isKhushi ? (
-        <VStack
-          w="100%"
-          maxW="600px"
-          p={8}
-          borderRadius="lg"
-          bg={useColorModeValue("gray.800", "gray.700")}
-          boxShadow="dark-lg"
-        >
-          <Text
-            fontSize="2xl"
-            fontWeight="bold"
-            mb={4}
-            textAlign="center"
-            _hover={{ color: "red.400" }}
-          >
-            Are you Khushi Choudhary? <br />
-            (get the personalised response if yes)
-          </Text>
-          <RadioGroup
-            onChange={handleAnswerChange}
-            value={answers[currentQuestion] || ""}
-          >
-            <Stack direction="column" spacing={4}>
-              <Radio
-                _checked={{
-                  bg: "red.500",
-                  color: "white",
-                  borderColor: "red.500",
-                }}
-                _hover={{ bg: "red.700" }}
-                onClick={onOpen}
-                onChange={onOpen}
-              >
-                Yes
-              </Radio>
-              <Radio
-                _checked={{
-                  bg: "red.500",
-                  color: "white",
-                  borderColor: "red.500",
-                }}
-                _hover={{ bg: "red.700" }}
-                onClick={() => setIsKhushi(false)}
-                onChange={() => setIsKhushi(false)}
-              >
-                Yes but I wouldn't admit because i despise you so much
-              </Radio>
-            </Stack>
-          </RadioGroup>
-          <Button
-            mt={8}
-            w="full"
-            bg="red.500"
-            color="white"
-            _hover={{ bg: "red.700", transform: "scale(1.05)" }}
-            onClick={handleNext}
-            isDisabled={!answers[currentQuestion]}
-          >
-            Next
-          </Button>
-        </VStack>
-      ) : (
-        <VStack
-          w="100%"
-          maxW="600px"
-          p={8}
-          borderRadius="lg"
-          bg={useColorModeValue("gray.800", "gray.700")}
-          boxShadow="dark-lg"
-        >
-          <Text>
-            {currentQuestion} out of {questions.length}
-          </Text>
-          {currentQuestion < questions.length ? (
-            <>
-              <Text
-                fontSize="2xl"
-                fontWeight="bold"
-                mb={4}
-                textAlign="center"
-                _hover={{ color: "red.400" }}
-              >
-                {questions[currentQuestion].question}
-              </Text>
-              <RadioGroup
-                onChange={handleAnswerChange}
-                value={answers[currentQuestion] || ""}
-              >
-                <Stack direction="column" spacing={4}>
-                  {questions[currentQuestion].options.map((option, index) => (
-                    <Radio
-                      key={index}
-                      value={option.text}
-                      _checked={{
-                        bg: "red.500",
-                        color: "white",
-                        borderColor: "red.500",
-                      }}
-                      _hover={{ bg: "red.700" }}
-                    >
-                      {option.text}
-                    </Radio>
-                  ))}
-                </Stack>
-              </RadioGroup>
+      <VStack
+        w="100%"
+        maxW="600px"
+        p={8}
+        borderRadius="lg"
+        bg={useColorModeValue("gray.800", "gray.700")}
+        boxShadow="dark-lg"
+      >
+        <Text>
+          {currentQuestion} out of {questions.length}
+        </Text>
+        {currentQuestion < questions.length ? (
+          <>
+            <Text
+              fontSize="2xl"
+              fontWeight="bold"
+              mb={4}
+              textAlign="center"
+              _hover={{ color: "red.400" }}
+            >
+              {questions[currentQuestion].question}
+            </Text>
+            <RadioGroup
+              onChange={handleAnswerChange}
+              value={answers[currentQuestion] || ""}
+            >
+              <Stack direction="column" spacing={4}>
+                {questions[currentQuestion].options.map((option, index) => (
+                  <Radio
+                    key={index}
+                    value={option.text}
+                    _checked={{
+                      bg: "red.500",
+                      color: "white",
+                      borderColor: "red.500",
+                    }}
+                    _hover={{ bg: "red.700" }}
+                  >
+                    {option.text}
+                  </Radio>
+                ))}
+              </Stack>
+            </RadioGroup>
+            <Button
+              mt={8}
+              w="full"
+              bg="red.500"
+              color="white"
+              _hover={{ bg: "red.700", transform: "scale(1.05)" }}
+              onClick={handleNext}
+              isDisabled={!answers[currentQuestion]}
+            >
+              Next
+            </Button>
+          </>
+        ) : (
+          <Box textAlign="center">
+            <Text fontSize="3xl" fontWeight="bold" mb={4}>
+              Your Total Toxicity Score: {score} / 100
+            </Text>
+            <VStack justify={"center"} alignItems={"center"} width={"100%"}>
               <Button
-                mt={8}
-                w="full"
                 bg="red.500"
                 color="white"
                 _hover={{ bg: "red.700", transform: "scale(1.05)" }}
-                onClick={handleNext}
-                isDisabled={!answers[currentQuestion]}
+                onClick={() => {
+                  setAnswers({});
+                  setCurrentQuestion(0);
+                  setScore(0);
+                  setAiRemark(""); // Reset AI remark
+                }}
               >
-                Next
+                Retake Quiz
               </Button>
-            </>
-          ) : (
-            <Box textAlign="center">
-              <Text fontSize="3xl" fontWeight="bold" mb={4}>
-                Your Total Toxicity Score: {score} / 100
-              </Text>
-              <VStack justify={"center"} alignItems={"center"} width={"100%"}>
-                <Button
-                  bg="red.500"
-                  color="white"
-                  _hover={{ bg: "red.700", transform: "scale(1.05)" }}
-                  onClick={() => {
-                    setAnswers({});
-                    setCurrentQuestion(0);
-                    setScore(0);
-                    setAiRemark(""); // Reset AI remark
-                  }}
-                >
-                  Retake Quiz
-                </Button>
-                <Button
-                  bg="purple.500"
-                  color="white"
-                  _hover={{ bg: "purple.700", transform: "scale(1.05)" }}
-                  mt={4}
-                  onClick={handleGetAiRemark}
-                >
-                  Let AI give you a review
-                </Button>
-              </VStack>
-              {aiRemark && (
-                <Box
-                  mt={4}
-                  p={4}
-                  bg="gray.700"
-                  borderRadius="md"
-                  boxShadow="lg"
-                >
-                  <Text fontSize="lg" fontWeight="bold">
-                    AI Remark:
-                  </Text>
-                  <Text>{aiRemark}</Text>
-                </Box>
-              )}
-            </Box>
-          )}
-        </VStack>
-      )}
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Hey Khushi</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            {loveRemark || (
-              <Text>
-                You're the cutest(ulti rokni hai) and most alive person i have
-                talked to, no doubt about 27(soon to be 28) but here nobody will
-                be judged on their intentions but on their actions. And your
-                action tells us that you can be pretty rough sometimes,
-                combining this with your previous attitude, it must feel pretty
-                rough and unexpected(just like i never expected myself to create
-                a personalised response for someone I texted out of no-where on
-                a random night but now it feels that she have become my day and
-                night(ulti mhi krni but washroom chale jao sayad baad me kaam
-                aye)). And by the if this message makes you even 1%
-                uncomfortable, just block me because no princess(ab krlo ye last
-                tha) desrves this. I'll give you 50 out of 100 of toxicity. but
-                infinity out of 100 for cuteness.
-              </Text>
+              <Button
+                bg="purple.500"
+                color="white"
+                _hover={{ bg: "purple.700", transform: "scale(1.05)" }}
+                mt={4}
+                onClick={handleGetAiRemark}
+              >
+                Let AI give you a review
+              </Button>
+            </VStack>
+            {aiRemark && (
+              <Box mt={4} p={4} bg="gray.700" borderRadius="md" boxShadow="lg">
+                <Text fontSize="lg" fontWeight="bold">
+                  AI Remark:
+                </Text>
+                <Text>{aiRemark}</Text>
+              </Box>
             )}
-          </ModalBody>
-          <ModalFooter>
-            <Button colorScheme="red" mr={3} onClick={handleLoveRemarks}>
-              Random sweet words
-            </Button>
-            <a href="tel:+919977079639">
-              <Button colorScheme="pink" mr={3} onClick={onClose}>
-                Okay
-              </Button>
-            </a>
-            <Button colorScheme="blue" mr={3} onClick={onClose}>
-              Close
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+          </Box>
+        )}
+      </VStack>
     </Box>
   );
 };
